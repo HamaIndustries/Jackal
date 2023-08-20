@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "jackal:block/secondary_reality_spike"
+    },
+    "powered=true": {
+      "model": "jackal:block/secondary_reality_spike_powered"
+    }
+  }
+}

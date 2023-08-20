@@ -22,6 +22,10 @@ public class JackalMod
 
     public static RegistryManager REGISTRY = new RegistryManager();
 
+    public static final ModObjects.MOD_ITEMS ITEMS = ModObjects.ITEMS;
+    public static final ModObjects.MOD_BLOCKS BLOCKS = ModObjects.BLOCKS;
+    public static final ModObjects.MOD_BLOCK_ENTITIES BLOCK_ENTITIES = ModObjects.BLOCK_ENTITIES;
+
     public JackalMod()
     {  
         // Register the setup method for modloading
@@ -52,7 +56,7 @@ public class JackalMod
         //         collect(Collectors.toList()));
     }
 
-    public static final ModObjects.ITEMS ITEMS = new ModObjects.ITEMS();
-    public static final ModObjects.BLOCKS BLOCKS = new ModObjects.BLOCKS();
-    public static final ModObjects.BLOCK_ENTITIES BLOCK_ENTITIES = new ModObjects.BLOCK_ENTITIES();
+    public static Logger logger(){ return LOGGER; }
+
+
 }
