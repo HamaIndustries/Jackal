@@ -94,25 +94,33 @@ public final class RealitySpike {
         @Override
         public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean mov) {
             // called on neighbor block update
-            if (!level.isClientSide()) {
-                boolean changed = false;
-                boolean nPower = level.hasNeighborSignal(pos);
-                if (nPower != state.getValue(BlockStateProperties.POWERED)) {
-                    state = state.setValue(BlockStateProperties.POWERED, nPower);
-                    changed = true;
-                }
-                
-                boolean valid = state.getValue(BlockStateProperties.ENABLED);
-                var chunk = level.getChunkAt(pos);
-                if (valid != (getSpikeCache(level.getChunkAt(pos)).size() == 1)) {
-                    state = state.setValue(BlockStateProperties.ENABLED, !valid);
-                    changed = true;
-                }
+            updateState(state, level, pos);
+        }
 
-                if (changed){
-                    level.setBlock(pos, state, UPDATE_CLIENTS);
-                }
+        /* returns true if state was updated. general function for checking if our state should be changed and changing it if so. */
+        protected boolean updateState(BlockState state, Level level, BlockPos pos){
+            var newState = state;
+            boolean power = state.getValue(BlockStateProperties.POWERED);
+            if (power != level.hasNeighborSignal(pos)) {
+                newState = newState.setValue(BlockStateProperties.POWERED, !power);
             }
+            
+            boolean valid = state.getValue(BlockStateProperties.ENABLED);
+            if (valid != hasValidConfiguration(level.getChunkAt(pos))) {
+                newState = newState.setValue(BlockStateProperties.ENABLED, !valid);
+            }
+
+            if (!(state.equals(newState))){
+                level.setBlock(pos, state, UPDATE_CLIENTS);
+                return true;
+            }
+            return false;
+        }
+
+        /* Checks if this spike is allowed to be powered (only spike in chunk, etc) */
+        public boolean hasValidConfiguration(LevelChunk chunk){
+            // save some time in casting by requiring chunk as parameter
+            return getSpikeCache(chunk).size() == 1;
         }
 
         protected void removeFromCache(LevelAccessor level, BlockPos pos){
