@@ -21,8 +21,17 @@ public class ModelProviders {
 
         @Override
         protected void registerStatesAndModels() {
-            registerBlockAndItem(PrimaryRealitySpike.ID, JackalMod.BLOCKS.PRS);
+            // registerBlockAndItem(PrimaryRealitySpike.ID, JackalMod.BLOCKS.PRS);
             registerBlockAndItem(SecondaryRealitySpike.ID, JackalMod.BLOCKS.SRS);
+            registerBlockAndItem(PrimaryRealitySpike.ID, JackalMod.BLOCKS.PRS);
+
+            // var prs = models().getExistingFile(modLoc("block/" + PrimaryRealitySpike.ID));
+            
+            // getVariantBuilder(JackalMod.BLOCKS.PRS).forAllStates(state -> 
+            //     ConfiguredModel.builder().modelFile(prs).build()
+            // );
+            // simpleBlockItem(JackalMod.BLOCKS.PRS, prs);
+            
         }
 
         private ModelFile registerBlockAndItem(String id, Block block){

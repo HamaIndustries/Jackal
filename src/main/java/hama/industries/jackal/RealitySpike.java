@@ -1,10 +1,7 @@
 package hama.industries.jackal;
 
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Function;
@@ -14,18 +11,13 @@ import java.util.stream.Collectors;
 import hama.industries.jackal.block.PrimaryRealitySpike;
 import hama.industries.jackal.block.SecondaryRealitySpike;
 import hama.industries.jackal.lib.JackalTags;
-import hama.industries.jackal.lib.LibCollections;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.commands.SetBlockCommand;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +30,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 
@@ -51,12 +45,13 @@ public final class RealitySpike {
 
     private RealitySpike(){}
 
+    @Mod.EventBusSubscriber(modid=JackalMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
     public static abstract class RealitySpikeBlock extends Block implements EntityBlock {
 
         private static Map<LevelChunk, Set<BlockPos>> chunkCache = new WeakHashMap<>();
         
         public static <T extends RealitySpikeBlock> Supplier<T> supplierOf(Function<Properties, T> rsb) {
-            return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F));            
+            return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F).noOcclusion());            
         }
 
         public RealitySpikeBlock(Properties props) {
@@ -100,9 +95,11 @@ public final class RealitySpike {
         /* returns true if state was updated. general function for checking if our state should be changed and changing it if so. */
         protected boolean updateState(BlockState state, Level level, BlockPos pos){
             var newState = state;
+            var signal = false;
             boolean power = state.getValue(BlockStateProperties.POWERED);
             if (power != level.hasNeighborSignal(pos)) {
                 newState = newState.setValue(BlockStateProperties.POWERED, !power);
+                signal = !power;
             }
             
             boolean valid = state.getValue(BlockStateProperties.ENABLED);
@@ -112,13 +109,14 @@ public final class RealitySpike {
 
             if (!(state.equals(newState))){
                 level.setBlock(pos, state, UPDATE_CLIENTS);
+                ((RealitySpikeBlockEntity)level.getBlockEntity(pos)).onRedstoneSignal();
                 return true;
             }
             return false;
         }
 
         /* Checks if this spike is allowed to be powered (only spike in chunk, etc) */
-        public boolean hasValidConfiguration(LevelChunk chunk){
+        public static boolean hasValidConfiguration(LevelChunk chunk){
             // save some time in casting by requiring chunk as parameter
             return getSpikeCache(chunk).size() == 1;
         }
@@ -141,7 +139,7 @@ public final class RealitySpike {
             }
             return null;
         }
-        protected Set<BlockPos> getSpikeCache(LevelChunk chunk){
+        protected static Set<BlockPos> getSpikeCache(LevelChunk chunk){
             // this could be generalized to a util function for arbitrary tags
             // also could possibly be optimized? not sure if jvm inlines the getTag
             return chunkCache.computeIfAbsent(chunk, c -> 
@@ -159,8 +157,19 @@ public final class RealitySpike {
                 // useful to prevent checking for neighbors every tick
             }
         */
-        
+        @SubscribeEvent
+        public final static void clientSetup (final FMLClientSetupEvent event) {
+            ItemBlockRenderTypes.setRenderLayer(JackalMod.BLOCKS.PRS, RenderType.cutout());
+        }
 	}
+
+    public static abstract class RealitySpikeBlockEntity extends BlockEntity {
+        protected RealitySpikeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+            super(type, pos, state);
+        }
+
+        public void onRedstoneSignal(){}
+    }
 
     public static BlockItem makeItem(Block block){
         return new BlockItem(block, new Item.Properties()

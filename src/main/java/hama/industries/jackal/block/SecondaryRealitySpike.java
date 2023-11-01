@@ -14,7 +14,7 @@ public class SecondaryRealitySpike extends RealitySpike.RealitySpikeBlock {
         super(props);
     }
 
-    public static final class BE extends BlockEntity {
+    public static final class BE extends RealitySpike.RealitySpikeBlockEntity {
         public BE(BlockPos pos, BlockState state) {
             super(JackalMod.BLOCK_ENTITIES.SRS, pos, state);
         }
