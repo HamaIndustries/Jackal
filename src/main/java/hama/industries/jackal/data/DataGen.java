@@ -14,7 +14,7 @@ public class DataGen {
         var generator = event.getGenerator();
         var fileHelper = event.getExistingFileHelper();
         if (event.includeClient()){
-            generator.addProvider(new ModelProviders.RealitySpikeBlockStateProvider(generator, JackalMod.MODID, fileHelper));
+            generator.addProvider(new ModelProviders.CLBlockStateProvider(generator, JackalMod.MODID, fileHelper));
         } 
         if (event.includeServer()) {
             TagProviders.provideAll(generator, fileHelper);

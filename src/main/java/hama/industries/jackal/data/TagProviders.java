@@ -11,7 +11,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class TagProviders {
     public static void provideAll(DataGenerator gen, ExistingFileHelper fileHelper){
-        var blockTags = new BlockTagsProvider(gen, JackalMod.MODID, fileHelper);
+        var blockTags = new JackalBlockTagsProvider(gen, JackalMod.MODID, fileHelper);
         gen.addProvider(blockTags);
         gen.addProvider(new JackalItemTagsProvider(gen, blockTags, JackalMod.MODID, fileHelper));
     }
@@ -28,8 +28,8 @@ public class TagProviders {
 
         @Override
         protected void addTags() {
-            tag(JackalTags.BLOCK.REALITY_SPIKES).add(
-                JackalMod.BLOCKS.PRS, JackalMod.BLOCKS.SRS
+            tag(JackalTags.BLOCK.CHUNK_LOADERS).add(
+                JackalMod.BLOCKS.PRIMARY_CL, JackalMod.BLOCKS.SECONDARY_CL
             );
         }
 
@@ -48,10 +48,10 @@ public class TagProviders {
 
         @Override
         protected void addTags() {
-            this.copy(JackalTags.BLOCK.REALITY_SPIKES, JackalTags.ITEM.REALITY_SPIKES);
+            this.copy(JackalTags.BLOCK.CHUNK_LOADERS, JackalTags.ITEM.CHUNK_LOADERS);
             
-            tag(JackalTags.ITEM.REALITY_SPIKES).add(
-                JackalMod.ITEMS.PRS, JackalMod.ITEMS.SRS
+            tag(JackalTags.ITEM.CHUNK_LOADERS).add(
+                JackalMod.ITEMS.PRIMARY_CL, JackalMod.ITEMS.SECONDARY_CL
             );
         }
 

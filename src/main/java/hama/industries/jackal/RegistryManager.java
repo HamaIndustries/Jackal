@@ -1,5 +1,6 @@
 package hama.industries.jackal;
 
+import hama.industries.jackal.block.AbstractCLBlock;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -17,7 +18,7 @@ public class RegistryManager {
     
     public <B extends IEventBus> void registerAllModBus(B mod_bus){
 
-        RealitySpike.registerAll(this);
+        AbstractCLBlock.registerAll(this);
 
         BLOCK_ENTITIES.register(mod_bus);
         BLOCKS.register(mod_bus);

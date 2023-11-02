@@ -1,0 +1,32 @@
+design ideas to keep things straight
+
+JACKAL's Anotha ChunkA Loada seeks to right the wrongs of the past and bring glory to this time.
+
+JACKAL concentrates on intelligent chunk loading management strategies: Ideally,
+the minimum number of chunks possible should be loaded at any one time.
+
+The first means of accomplishing our task will be through use of primary and secondary
+chunk loaders (PCLs and SCLs). These keep the chunk they are in loaded when the following rules
+are obeyed:
+
+Primary:
+- This is the only CL in the chunk
+- This CL is powered (redstone/energy/whatever)
+
+Secondary: Same rules as above, AND
+- This SCL is in range (according to some range metric) of a powered and loaded PCL
+
+Accordingly, they have certain capabilities:
+
+Primary:
+- On some trigger, wake up this chunk and all available SCLs in range
+
+---------------
+Beyond abstraction, we now discuss implementation.
+
+On place/load, PCLs must:
+- load the current chunk
+- load stored list of SCL positions
+- update list based on 
+- Next, if powered, PCLs load all known SCL chunks
+

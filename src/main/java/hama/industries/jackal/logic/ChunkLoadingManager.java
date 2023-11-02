@@ -22,12 +22,11 @@ public class ChunkLoadingManager {
         });
     }
 
-    private ChunkPos root;
-    private Set<ChunkPos> chunks = new HashSet<>();
+    private Set<ChunkPos> p_chunks = new HashSet<>();
+    private Set<ChunkPos> s_chunks = new HashSet<>();
     private ServerLevel level;
 
-    public ChunkLoadingManager(ChunkPos pos, ServerLevel level){
-        this.root = pos;
+    public ChunkLoadingManager(ServerLevel level){
         this.level = level;
     }
 
@@ -35,54 +34,64 @@ public class ChunkLoadingManager {
         // managers.remove(this);
     }
 
-    private void pruneUnreachable(){
-        Set<ChunkPos> reachable = new HashSet<>(Set.of(root));
-        reachable.add(root);
-        Set<ChunkPos> check = new HashSet<>(Set.of(root));
-        check.add(root);
-        while(!check.isEmpty()){
-            // make set of nodes surrounding checked nodes
-            var surround = check.stream().<ChunkPos>mapMulti(
-                (p, c) -> {c.accept(new ChunkPos(p.x-1, p.z));c.accept(new ChunkPos(p.x+1, p.z));c.accept(new ChunkPos(p.x, p.z-1));c.accept(new ChunkPos(p.x, p.z+1));}
-            ).collect(Collectors.toSet());
+    
 
-            // intersection of checks and search list is our next list of valid chunks to check
-            check = Sets.intersection(surround, chunks);
 
-            // add valid chunks to reachable
-            reachable.addAll(check);
-        }
-        // unload unreachable
-        Sets.difference(chunks, reachable).forEach(chunks::remove);
-        this.chunks = reachable;
-    }
 
-    private void addChunk(ChunkPos pos) {
-        // simpler but I want to avoid redundancy
-        // add this back in if we want to check performance
-        // for (var chunk : chunks){
-        //     if(chunk.getChessboardDistance(pos) == 1){
-        //         chunks.add(pos);
-        //         return;
-        //     }
-        // }
-        chunks.add(pos);
-    }
 
-    private void removeChunk(ChunkPos pos) {
-        chunks.remove(pos);
-        // TODO LOAD
-    }
 
-    // @Override
-    // public void addChunkAndLoad(ChunkPos pos) {
-    //     addChunk(pos);
-    //     // TODO ADD LOAD
+
+
+
+
+    // private void pruneUnreachable(){
+    //     Set<ChunkPos> reachable = new HashSet<>(Set.of(root));
+    //     reachable.add(root);
+    //     Set<ChunkPos> check = new HashSet<>(Set.of(root));
+    //     check.add(root);
+    //     while(!check.isEmpty()){
+    //         // make set of nodes surrounding checked nodes
+    //         var surround = check.stream().<ChunkPos>mapMulti(
+    //             (p, c) -> {c.accept(new ChunkPos(p.x-1, p.z));c.accept(new ChunkPos(p.x+1, p.z));c.accept(new ChunkPos(p.x, p.z-1));c.accept(new ChunkPos(p.x, p.z+1));}
+    //         ).collect(Collectors.toSet());
+
+    //         // intersection of checks and search list is our next list of valid chunks to check
+    //         check = Sets.intersection(surround, chunks);
+
+    //         // add valid chunks to reachable
+    //         reachable.addAll(check);
+    //     }
+    //     // unload unreachable
+    //     Sets.difference(chunks, reachable).forEach(chunks::remove);
+    //     this.chunks = reachable;
     // }
 
-    // @Override
-    // public void removeChunkAndUnload(ChunkPos pos) {
-    //     removeChunk(pos);
-    //     pruneUnreachable();
+    // private void addChunk(ChunkPos pos) {
+    //     // simpler but I want to avoid redundancy
+    //     // add this back in if we want to check performance
+    //     // for (var chunk : chunks){
+    //     //     if(chunk.getChessboardDistance(pos) == 1){
+    //     //         chunks.add(pos);
+    //     //         return;
+    //     //     }
+    //     // }
+    //     chunks.add(pos);
     // }
+
+    // private void removeChunk(ChunkPos pos) {
+    //     chunks.remove(pos);
+    //     // TODO LOAD
+    // }
+
+    // // @Override
+    // // public void addChunkAndLoad(ChunkPos pos) {
+    // //     addChunk(pos);
+    // //     // TODO ADD LOAD
+    // // }
+
+    // // @Override
+    // // public void removeChunkAndUnload(ChunkPos pos) {
+    // //     removeChunk(pos);
+    // //     pruneUnreachable();
+    // // }
 }

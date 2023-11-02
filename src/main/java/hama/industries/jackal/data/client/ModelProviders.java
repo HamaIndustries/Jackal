@@ -1,8 +1,8 @@
 package hama.industries.jackal.data.client;
 
 import hama.industries.jackal.JackalMod;
-import hama.industries.jackal.block.PrimaryRealitySpike;
-import hama.industries.jackal.block.SecondaryRealitySpike;
+import hama.industries.jackal.block.PrimaryCLBlock;
+import hama.industries.jackal.block.SecondaryCLBlock;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -12,18 +12,18 @@ import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModelProviders {
-    public static class RealitySpikeBlockStateProvider extends BlockStateProvider{
+    public static class CLBlockStateProvider extends BlockStateProvider{
         // private static final ModelTemplate ITEM_MODEL = new ModelTemplate(Optional.of(new ResourceLocation("item/generated")), Optional.empty(), null)
 
-        public RealitySpikeBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
+        public CLBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
             super(gen, modid, exFileHelper);
         }
 
         @Override
         protected void registerStatesAndModels() {
             // registerBlockAndItem(PrimaryRealitySpike.ID, JackalMod.BLOCKS.PRS);
-            registerBlockAndItem(SecondaryRealitySpike.ID, JackalMod.BLOCKS.SRS);
-            registerBlockAndItem(PrimaryRealitySpike.ID, JackalMod.BLOCKS.PRS);
+            registerBlockAndItem(PrimaryCLBlock.ID, JackalMod.BLOCKS.PRIMARY_CL);
+            registerBlockAndItem(SecondaryCLBlock.ID, JackalMod.BLOCKS.SECONDARY_CL);
 
             // var prs = models().getExistingFile(modLoc("block/" + PrimaryRealitySpike.ID));
             
@@ -39,11 +39,11 @@ public class ModelProviders {
             var poweredModel = models().cubeAll(id + "_powered", modLoc("block/" + id + "_powered"));
 
             getVariantBuilder(block)
-                .partialState().with(BlockStateProperties.POWERED, false)
+                .partialState().with(BlockStateProperties.ENABLED, false)
                     .modelForState()
                     .modelFile(baseModel)
                     .addModel()
-                .partialState().with(BlockStateProperties.POWERED, true)
+                .partialState().with(BlockStateProperties.ENABLED, true)
                     .modelForState()
                     .modelFile(poweredModel)
                     .addModel();

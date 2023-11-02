@@ -1,9 +1,9 @@
 {
   "variants": {
-    "powered=false": {
+    "enabled=false": {
       "model": "jackal:block/secondary_reality_spike"
     },
-    "powered=true": {
+    "enabled=true": {
       "model": "jackal:block/secondary_reality_spike_powered"
     }
   }

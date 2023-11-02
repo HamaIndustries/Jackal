@@ -13,19 +13,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class JackalTags {
 
     private static final class LABELS {
-        public static final String REALITY_SPIKES = "reality_spikes";
+        public static final String CHUNK_LOADERS = "reality_spikes";
     }
 
-    // public static final class BLOCK_ENTITY {
-    //     public static final TagKey<BlockEntityType<?>> REALITY_SPIKES = tag(LABELS.REALITY_SPIKES);
-
-    //     private static TagKey<BlockEntityType<?>> tag(String key){
-    //         return ForgeRegistries.BLOCK_ENTITIES.tags().createTagKey(new ResourceLocation(JackalMod.MODID, key));
-    //     }
-    // }
-
     public static final class ITEM {
-        public static final TagKey<Item> REALITY_SPIKES = tag(LABELS.REALITY_SPIKES);
+        public static final TagKey<Item> CHUNK_LOADERS = tag(LABELS.CHUNK_LOADERS);
 
         private static TagKey<Item> tag(String key){
             return ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation(JackalMod.MODID, key));
@@ -33,7 +25,7 @@ public class JackalTags {
     }
 
     public static final class BLOCK {
-        public static final TagKey<Block> REALITY_SPIKES = tag(LABELS.REALITY_SPIKES);
+        public static final TagKey<Block> CHUNK_LOADERS = tag(LABELS.CHUNK_LOADERS);
 
         private static TagKey<Block> tag(String key){
             return ForgeRegistries.BLOCKS.tags().createTagKey(new ResourceLocation(JackalMod.MODID, key));
