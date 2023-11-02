@@ -3,7 +3,6 @@ package hama.industries.jackal.block.entity;
 import java.util.HashSet;
 
 import hama.industries.jackal.block.AbstractCLBlock;
-import hama.industries.jackal.lib.JackalTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -15,13 +14,10 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
         super(type, pos, state);
     }
 
-    protected HashSet<AbstractCLBlockEnt> cache;
+    protected HashSet<AbstractCLBlockEnt> cache; // shared by all others in chunk
 
     // /* If valid, updates its blockstate to match. Otherwise, updates itself and all neighbors */
     public void updateNeighborhood(){
-        System.out.println("waaw");
-        System.out.println(cache);
-        System.out.println(JackalTags.BLOCK.CHUNK_LOADERS);
         if (cache == null){
             var level = getLevel();
             if (!this.level.isClientSide) {
@@ -30,8 +26,6 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
                         && be != this
                         && ((AbstractCLBlockEnt)be).cache != null
                     ){
-                        System.out.println("+++");
-                        System.out.println(be);
                         cache = ((AbstractCLBlockEnt)be).cache;
                         break;
                     }
@@ -42,7 +36,6 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
                 cache.add(this);
             }
         }
-        System.out.println(cache);
 
         if (cache.size() == 1){
             setEnabled(true);
@@ -77,7 +70,13 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
         if (!this.level.isClientSide && !this.isRemoved() && getBlockState().getValue(BlockStateProperties.ENABLED) != value){
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlockStateProperties.ENABLED, value));
         }
+
+        updateActiveState();        
     }
+
+    // register with relevant manager that we control this chunk
+    protected abstract void registerSelf();
+    protected abstract void deregisterSelf();
 
     /* 
         Check whether we are in a valid active state according to our CL's rules.
@@ -87,5 +86,13 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
      */
     public boolean isActive(){
         return getBlockState().getValue(BlockStateProperties.ENABLED);
+    }
+
+    public void updateActiveState(){
+        if (isActive()){
+            registerSelf();
+        } else {
+            deregisterSelf();
+        }
     }
 }

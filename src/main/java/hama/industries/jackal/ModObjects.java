@@ -8,7 +8,6 @@ import hama.industries.jackal.block.PrimaryCLBlock;
 import hama.industries.jackal.block.SecondaryCLBlock;
 import hama.industries.jackal.block.entity.PrimaryCLBlockEnt;
 import hama.industries.jackal.block.entity.SecondaryCLBlockEnt;
-import hama.industries.jackal.lib.JackalTags;
 
 class ModObjects {
     @ObjectHolder(JackalMod.MODID)

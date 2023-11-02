@@ -5,11 +5,9 @@ import net.minecraft.world.level.ChunkPos;
 public final class PrimaryCL {
     private ChunkPos id;
     private boolean active = false;
-    ChunkLoadingManager manager;
+    // ChunkLoadingManager manager;
 
-    public PrimaryCL(ChunkLoadingManager manager) {
-        this.manager = manager;
-    }
-
-    
+    // public PrimaryCL(ChunkLoadingManager manager) {
+    //     this.manager = manager;
+    // }
 }

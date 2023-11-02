@@ -7,6 +7,4 @@ import net.minecraft.world.level.ChunkPos;
  * One logical loader per chunk.
  */
 public final class SecondaryCL {
-    private ChunkPos id;
-    private boolean powered = false;
 }

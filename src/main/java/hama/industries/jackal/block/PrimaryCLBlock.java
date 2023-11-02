@@ -37,6 +37,9 @@ public final class PrimaryCLBlock extends AbstractCLBlock {
         boolean signal = level.hasNeighborSignal(pos);
         if (state.getValue(BlockStateProperties.POWERED) != signal){
             level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.POWERED, signal));
+            if (!level.isClientSide){
+                ((PrimaryCLBlockEnt)level.getBlockEntity(pos)).updateActiveState();
+            }
         }
     }
 

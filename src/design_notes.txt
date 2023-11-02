@@ -10,10 +10,13 @@ chunk loaders (PCLs and SCLs). These keep the chunk they are in loaded when the 
 are obeyed:
 
 Primary:
-- This is the only CL in the chunk
-- This CL is powered (redstone/energy/whatever)
+- This is the only CL in the chunk of any kind
+- PCL is powered with redstone OR
+- If attached to trigger, trigger is enabled, redstone DISABLES the PCL.
+- (TBD) PCL is fueled (amethyst?)
 
-Secondary: Same rules as above, AND
+Secondary:
+- This is the only CL in the chunk of any kind
 - This SCL is in range (according to some range metric) of a powered and loaded PCL
 
 Accordingly, they have certain capabilities:
@@ -24,9 +27,22 @@ Primary:
 ---------------
 Beyond abstraction, we now discuss implementation.
 
-On place/load, PCLs must:
-- load the current chunk
-- load stored list of SCL positions
-- update list based on 
-- Next, if powered, PCLs load all known SCL chunks
+CLs do not handle loading logic. CL blocks maintain state. 
+CL block entities (BEs) read and manipulate block state, and perform
+validation. When this block is considered valid, it registers itself
+as its given type (primary or secondary) with the handler for the
+current level.
+
+The handler manages chunkloading logic. It maintains a set of abstract PCL and SCLs by
+listening for register and deregisters. The handler is a capability (cap: ICLManagerCapability/impl: CLManager)
+attached to each level that must be saved and loaded with the level. The handler considers
+the set of PCLs and SCLs and loads all SCL chunks in range of active PCL chunks.
+- a chunk may only be SCL or PCL (mutually exclusive)
+- SCLs are considered always active for now, PCLs are active based on some condition such as
+    + chunk loaded by redstone power on PCL block
+    + chunk loaded by player
+    + trigger keeps PCL active
+- PCLs and SCLs are loaded separately from their block counterparts. This allows for
+    wakeups on inactive PCLs should some outside trigger change its state.
+
 
