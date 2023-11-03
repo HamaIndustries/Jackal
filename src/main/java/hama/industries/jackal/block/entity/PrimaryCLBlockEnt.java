@@ -15,7 +15,7 @@ public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
 
     @Override
     public boolean isActive(){
-        return super.isActive() && getBlockState().getValue(BlockStateProperties.POWERED);
+        return super.isEnabled() && getBlockState().getValue(BlockStateProperties.POWERED);
     }
     
     LazyOptional<ICLManagerCapability> manager = LazyOptional.empty();
@@ -35,5 +35,13 @@ public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
         if(this.level.isClientSide) return;
         if (!manager.isPresent()) return;
         manager.ifPresent(m -> m.removePrimaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+    }
+
+    public void updateActiveState(){
+        if (isActive()){
+            System.out.println("todo: set pcl active by redstone");
+        } else {
+            System.out.println("todo: set pcl inactive by redstone");
+        }
     }
 }

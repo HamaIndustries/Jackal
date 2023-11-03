@@ -59,19 +59,25 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
             cache.remove(this);
             for (var other : cache){
                 other.updateNeighborhood();
-                break;
+                return;
             }
+            // if no others, this is the main CL, so we want to deregister
+            deregisterSelf();
         }
         super.setRemoved();
     }
 
-    private void setEnabled(boolean value){
+    private void setEnabled(boolean enabled){
         var level = getLevel();
-        if (!this.level.isClientSide && !this.isRemoved() && getBlockState().getValue(BlockStateProperties.ENABLED) != value){
-            level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlockStateProperties.ENABLED, value));
+        if (!this.level.isClientSide && !this.isRemoved() && getBlockState().getValue(BlockStateProperties.ENABLED) != enabled){
+            level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlockStateProperties.ENABLED, enabled));
         }
 
-        updateActiveState();        
+        if (enabled) {
+            registerSelf();
+        } else {
+            deregisterSelf();
+        }
     }
 
     // register with relevant manager that we control this chunk
@@ -84,15 +90,9 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
         Rules for all CLs:
             - This is the only CL in the chunk
      */
-    public boolean isActive(){
+    public boolean isEnabled(){
         return getBlockState().getValue(BlockStateProperties.ENABLED);
     }
 
-    public void updateActiveState(){
-        if (isActive()){
-            registerSelf();
-        } else {
-            deregisterSelf();
-        }
-    }
+    public abstract boolean isActive(); // active = allowed to force load if prompted
 }

@@ -1,13 +1,23 @@
 package hama.industries.jackal.logic;
 
-import net.minecraft.world.level.ChunkPos;
+import java.util.UUID;
 
-public final class PrimaryCL {
-    private ChunkPos id;
+public final class PrimaryCL implements Comparable<PrimaryCL> {
+    protected final UUID id = UUID.randomUUID();
+
     private boolean active = false;
-    // ChunkLoadingManager manager;
+    private ICLManagerCapability manager;
 
-    // public PrimaryCL(ChunkLoadingManager manager) {
-    //     this.manager = manager;
-    // }
+    public PrimaryCL(ICLManagerCapability manager) {
+        this.manager = manager;
+    }
+
+    void setActive(boolean v){ active = v; }
+
+    boolean isActive() { return active; }
+
+    @Override
+    public int compareTo(PrimaryCL other) {        
+        return id.compareTo(other.id);
+    }
 }

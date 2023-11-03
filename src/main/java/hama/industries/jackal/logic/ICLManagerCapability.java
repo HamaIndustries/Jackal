@@ -17,6 +17,8 @@ public interface ICLManagerCapability {
     public void removePrimaryCL(ChunkPos pos);
     public void removeSecondaryCL(ChunkPos pos);
 
+    public void setPrimaryActive(ChunkPos pos, boolean active);
+
     public static void registerCaps(RegisterCapabilitiesEvent event) {
         event.register(ICLManagerCapability.class);
     }

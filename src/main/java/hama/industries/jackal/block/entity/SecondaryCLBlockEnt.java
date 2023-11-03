@@ -26,7 +26,11 @@ public class SecondaryCLBlockEnt extends AbstractCLBlockEnt {
     @Override
     protected void deregisterSelf() {
         if(this.level.isClientSide) return;
-        if (!manager.isPresent()) return;
         manager.ifPresent(m -> m.removeSecondaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+    }
+
+    @Override
+    public boolean isActive() {
+        return isEnabled();
     }    
 }

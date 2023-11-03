@@ -7,4 +7,5 @@ import net.minecraft.world.level.ChunkPos;
  * One logical loader per chunk.
  */
 public final class SecondaryCL {
+    
 }
