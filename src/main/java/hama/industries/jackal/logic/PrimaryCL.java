@@ -2,15 +2,13 @@ package hama.industries.jackal.logic;
 
 import java.util.UUID;
 
-public final class PrimaryCL implements Comparable<PrimaryCL> {
-    protected final UUID id = UUID.randomUUID();
+final class PrimaryCL implements Comparable<PrimaryCL> {
+    protected final UUID id;
 
     private boolean active = false;
-    private ICLManagerCapability manager;
 
-    public PrimaryCL(ICLManagerCapability manager) {
-        this.manager = manager;
-    }
+    public PrimaryCL() { id = UUID.randomUUID(); }
+    public PrimaryCL(UUID id) { this.id = id; }
 
     void setActive(boolean v){ active = v; }
 

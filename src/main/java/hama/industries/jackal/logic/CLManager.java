@@ -2,29 +2,35 @@ package hama.industries.jackal.logic;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.mojang.datafixers.types.templates.Tag.TagType;
 
 import hama.industries.jackal.JackalMod;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StreamTagVisitor;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagVisitor;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ChunkTaskPriorityQueue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.world.ForgeChunkManager;
-import net.minecraftforge.common.world.ForgeChunkManager.LoadingValidationCallback;
 import net.minecraftforge.common.world.ForgeChunkManager.TicketHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(modid = JackalMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public final class CLManager implements ICLManagerCapability{
+public final class CLManager implements ICLManagerCapability, INBTSerializable<CompoundTag> {
     public static final String RESOURCE_ID = "chunk_loader_manager_impl";
     private static final int RANGE = 7;
 
@@ -45,9 +51,9 @@ public final class CLManager implements ICLManagerCapability{
         var manager = new CLManager((ServerLevel)event.getObject());
         LazyOptional<ICLManagerCapability> optional = LazyOptional.of(() -> manager);
 
-        ICapabilityProvider provider = new ICapabilityProvider() { 
-            // volatile, doesn't save on world load. use serializable to persist.
+        var provider = new ICapabilitySerializable<CompoundTag>() { 
             // https://forge.gemwire.uk/wiki/Capabilities/1.18#Attaching_a_Capability
+            
             @Override
             public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction direction) {
                 if (cap == ICLManagerCapability.CL_MANAGER_CAPABILITY) {
@@ -55,16 +61,44 @@ public final class CLManager implements ICLManagerCapability{
                 }
                 return LazyOptional.empty();
             }
+
+            @Override
+            public CompoundTag serializeNBT() {
+                return manager.serializeNBT();
+            }
+
+            @Override
+            public void deserializeNBT(CompoundTag nbt) {
+                manager.deserializeNBT(nbt);
+            }
         };
         event.addCapability(new ResourceLocation(JackalMod.MODID, RESOURCE_ID), provider);
         event.addListener(optional::invalidate);
     }
 
+    /* In theory, no need to validate tickets as long as we serialize the manager and preserve ticker owner UUIDs */
+    // @SubscribeEvent
+    // public static void setup(final FMLCommonSetupEvent event){
+    //     event.enqueueWork(() -> ForgeChunkManager.setForcedChunkLoadingCallback(JackalMod.MODID, CLManager::validateTickets));
+    // }
+
+    public static void validateTickets(ServerLevel level, TicketHelper ticketHelper) {
+        System.out.println("pre");
+        ticketHelper.getEntityTickets().entrySet().stream().forEach(entry -> {ticketHelper.removeAllTickets(entry.getKey());});
+        // var optional = level.getCapability(ICLManagerCapability.CL_MANAGER_CAPABILITY);
+        // if (!optional.isPresent()) throw new UnsupportedOperationException("chunkloading manager not gettable for world " + level);
+        System.out.println("post");
+    }
+
     @Override
     public void addPrimaryCL(ChunkPos pos) {
         System.out.println("add primary");
-        pcls.putIfAbsent(pos, new PrimaryCL(this));
+        pcls.putIfAbsent(pos, new PrimaryCL());
     }
+
+    // private void status(){
+    //     System.out.println(RESOURCE_ID);
+    // }
 
     @Override
     public void addSecondaryCL(ChunkPos pos) {
@@ -94,8 +128,12 @@ public final class CLManager implements ICLManagerCapability{
     @Override
     public void setPrimaryActive(ChunkPos pos, boolean active){
         var primary = pcls.get(pos);
-        
-        if (primary == null && !active) return; // allow a crash if we try to set an invalid primary active
+
+        if (primary == null) {
+            if (active){
+                throw new UnsupportedOperationException("Tried to set a nonexistent primary at " + pos + " to active");
+            } else { return; }
+        } else if (primary.isActive() == active) { return; }
 
         primary.setActive(active);
         getCLsInRange(scls, pos)
@@ -113,4 +151,46 @@ public final class CLManager implements ICLManagerCapability{
     private <R> Stream<R> getCLsInRange(Map<ChunkPos, R> clMap, ChunkPos pos){
         return getChunksInRange(clMap, pos).map(p -> clMap.get(p));
     }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var pTags = new ListTag();
+        for (var entry : pcls.entrySet()){
+            var pt = new CompoundTag();
+            pt.putInt("x", entry.getKey().x);
+            pt.putInt("z", entry.getKey().z);
+            pt.putUUID("id", entry.getValue().id);
+            pt.putBoolean("active", entry.getValue().isActive());
+            pTags.add(pt);
+        }
+        var sTags = new ListTag();
+        for (var entry : scls.entrySet()){
+            var st = new CompoundTag();
+            st.putInt("x", entry.getKey().x);
+            st.putInt("z", entry.getKey().z);
+            sTags.add(st);
+        }
+        var nbt = new CompoundTag();
+        nbt.put("primaries", pTags);
+        nbt.put("secondaries", sTags);
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        nbt.getList("secondaries", Tag.TAG_COMPOUND).forEach(pt -> {
+            var ptag = (CompoundTag)pt;
+            scls.put(new ChunkPos(ptag.getInt("x"), ptag.getInt("z")), new SecondaryCL());
+        });
+
+        nbt.getList("primaries", Tag.TAG_COMPOUND).forEach(pt -> {
+            var ptag = (CompoundTag)pt;
+            var pos = new ChunkPos(ptag.getInt("x"), ptag.getInt("z"));
+            pcls.put(pos, new PrimaryCL(ptag.getUUID("id")));
+            if (ptag.getBoolean("active")){
+                setPrimaryActive(pos, true);
+            }
+        });
+    }
+
 }

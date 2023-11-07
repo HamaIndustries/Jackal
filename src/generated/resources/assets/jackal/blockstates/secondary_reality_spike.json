@@ -1,10 +1,10 @@
 {
   "variants": {
     "enabled=false": {
-      "model": "jackal:block/secondary_reality_spike"
+      "model": "jackal:block/scl_disabled"
     },
     "enabled=true": {
-      "model": "jackal:block/secondary_reality_spike_powered"
+      "model": "jackal:block/scl_enabled_active"
     }
   }
 }

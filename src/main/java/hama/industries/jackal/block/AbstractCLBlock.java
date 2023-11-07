@@ -2,6 +2,10 @@ package hama.industries.jackal.block;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -15,7 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 import hama.industries.jackal.JackalMod;
@@ -25,8 +31,15 @@ import hama.industries.jackal.RegistryManager;
 public abstract class AbstractCLBlock extends Block implements EntityBlock {
 
     public static <T extends AbstractCLBlock> Supplier<T> supplierOf(Function<Properties, T> rsb) {
-        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F));            
+        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F).noOcclusion());            
     }
+
+    @SubscribeEvent
+    public final static void clientSetup (final FMLClientSetupEvent event) {
+        ItemBlockRenderTypes.setRenderLayer(JackalMod.BLOCKS.PRIMARY_CL, RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(JackalMod.BLOCKS.SECONDARY_CL, RenderType.cutout());
+    }
+	
 
     public AbstractCLBlock(Properties props) {
         super(props);

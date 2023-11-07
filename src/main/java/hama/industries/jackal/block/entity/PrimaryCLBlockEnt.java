@@ -1,13 +1,13 @@
 package hama.industries.jackal.block.entity;
 
 import hama.industries.jackal.JackalMod;
-import hama.industries.jackal.logic.ICLManagerCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.common.util.LazyOptional;
 
 public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
+
+    private boolean hasTrigger = false;
 
     public PrimaryCLBlockEnt(BlockPos pos, BlockState state) {
         super(JackalMod.BLOCK_ENTITIES.PRIMARY_CL, pos, state);
@@ -15,33 +15,22 @@ public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
 
     @Override
     public boolean isActive(){
-        return super.isEnabled() && getBlockState().getValue(BlockStateProperties.POWERED);
+        return isEnabled() && (getBlockState().getValue(BlockStateProperties.POWERED) != hasTrigger);
     }
-    
-    LazyOptional<ICLManagerCapability> manager = LazyOptional.empty();
 
     @Override
     protected void registerSelf() {
         if(this.level.isClientSide) return;
-        if (!manager.isPresent()){
-            manager = getLevel().getCapability(ICLManagerCapability.CL_MANAGER_CAPABILITY);
-            manager.addListener(m -> {manager = LazyOptional.empty();});
-        }
-        manager.ifPresent(m -> m.addPrimaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+        getManager().ifPresent(m -> m.addPrimaryCL(getChunkPos()));
     }
 
     @Override
     protected void deregisterSelf() {
-        if(this.level.isClientSide) return;
-        if (!manager.isPresent()) return;
-        manager.ifPresent(m -> m.removePrimaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+        if(level.isClientSide || !manager.isPresent()) return;
+        getManager().ifPresent(m -> m.removePrimaryCL(getChunkPos()));
     }
 
     public void updateActiveState(){
-        if (isActive()){
-            System.out.println("todo: set pcl active by redstone");
-        } else {
-            System.out.println("todo: set pcl inactive by redstone");
-        }
+        getManager().ifPresent(m -> m.setPrimaryActive(getChunkPos(), isActive()));
     }
 }

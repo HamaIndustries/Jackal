@@ -15,18 +15,12 @@ public class SecondaryCLBlockEnt extends AbstractCLBlockEnt {
 
     @Override
     protected void registerSelf() {
-        if(this.level.isClientSide) return;
-        if (!manager.isPresent()){
-            manager = getLevel().getCapability(ICLManagerCapability.CL_MANAGER_CAPABILITY);
-            manager.addListener(m -> {manager = LazyOptional.empty();});
-        }
-        manager.ifPresent(m -> m.addSecondaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+        getManager().ifPresent(m -> m.addSecondaryCL(getChunkPos()));
     }
     
     @Override
     protected void deregisterSelf() {
-        if(this.level.isClientSide) return;
-        manager.ifPresent(m -> m.removeSecondaryCL(getLevel().getChunkAt(worldPosition).getPos()));
+        getManager().ifPresent(m -> m.removeSecondaryCL(getChunkPos()));
     }
 
     @Override
