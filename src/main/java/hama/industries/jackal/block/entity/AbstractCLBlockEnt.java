@@ -73,6 +73,7 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
     }
 
     private void setEnabled(boolean enabled){
+        setChanged();
         var level = getLevel();
         if (!this.isRemoved() && getBlockState().getValue(BlockStateProperties.ENABLED) != enabled){
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(BlockStateProperties.ENABLED, enabled));

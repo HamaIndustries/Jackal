@@ -33,4 +33,12 @@ public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
     public void updateActiveState(){
         getManager().ifPresent(m -> m.setPrimaryActive(getChunkPos(), isActive()));
     }
+
+    // @Override
+    // public void onLoad(){
+    //     super.onLoad();
+    //     if (!level.isClientSide){
+    //         updateActiveState();
+    //     }
+    // }
 }

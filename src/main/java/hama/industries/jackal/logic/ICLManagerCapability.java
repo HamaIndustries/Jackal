@@ -1,5 +1,7 @@
 package hama.industries.jackal.logic;
 
+import java.util.UUID;
+
 import hama.industries.jackal.JackalMod;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.capabilities.Capability;
@@ -16,6 +18,9 @@ public interface ICLManagerCapability {
     public void addSecondaryCL(ChunkPos pos);
     public void removePrimaryCL(ChunkPos pos);
     public void removeSecondaryCL(ChunkPos pos);
+    public void removeAllCLs();
+
+    public boolean hasPrimaryCL(UUID id);
 
     public void setPrimaryActive(ChunkPos pos, boolean active);
 

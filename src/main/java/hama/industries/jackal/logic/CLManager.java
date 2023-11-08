@@ -2,6 +2,7 @@ package hama.industries.jackal.logic;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.types.templates.Tag.TagType;
@@ -12,11 +13,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StreamTagVisitor;
 import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagTypes;
 import net.minecraft.nbt.TagVisitor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeConfig.Server;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
@@ -25,6 +28,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.common.world.ForgeChunkManager.TicketHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -76,33 +80,51 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
         event.addListener(optional::invalidate);
     }
 
-    /* In theory, no need to validate tickets as long as we serialize the manager and preserve ticker owner UUIDs */
-    // @SubscribeEvent
-    // public static void setup(final FMLCommonSetupEvent event){
-    //     event.enqueueWork(() -> ForgeChunkManager.setForcedChunkLoadingCallback(JackalMod.MODID, CLManager::validateTickets));
-    // }
+    public boolean hasPrimaryCL(UUID id){
+        return pcls.values().stream().anyMatch(pcl -> pcl.id == id);
+    }
 
     public static void validateTickets(ServerLevel level, TicketHelper ticketHelper) {
-        System.out.println("pre");
-        ticketHelper.getEntityTickets().entrySet().stream().forEach(entry -> {ticketHelper.removeAllTickets(entry.getKey());});
-        // var optional = level.getCapability(ICLManagerCapability.CL_MANAGER_CAPABILITY);
-        // if (!optional.isPresent()) throw new UnsupportedOperationException("chunkloading manager not gettable for world " + level);
-        System.out.println("post");
+        // var cap = level.getCapability(CL_MANAGER_CAPABILITY);
+        // if (!cap.isPresent()) throw new UnsupportedOperationException("chunkloading manager not gettable for world " + level);
+        // cap.ifPresent(manager ->
+        //     ticketHelper.getEntityTickets().entrySet().stream().forEach(entry -> {
+        //         if (!manager.hasPrimaryCL(entry.getKey())){
+        //             ticketHelper.removeAllTickets(entry.getKey());
+        //         }
+        //     }
+        // ));
+        ticketHelper.getEntityTickets().keySet().stream().forEach(id -> ticketHelper.removeAllTickets(id));
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(WorldEvent.Unload event){
+        var level = event.getWorld();
+        if (level instanceof ServerLevel) {
+            var cap = ((ServerLevel)level).getCapability(CL_MANAGER_CAPABILITY);
+            cap.ifPresent(manager -> {
+                manager.removeAllCLs();
+            });
+        }
+    }
+
+    @Override
+    public void removeAllCLs(){
+        for (var pos : pcls.keySet()){
+            removePrimaryCL(pos);
+        }
+        for (var pos : scls.keySet()){
+            removeSecondaryCL(pos);
+        }
     }
 
     @Override
     public void addPrimaryCL(ChunkPos pos) {
-        System.out.println("add primary");
         pcls.putIfAbsent(pos, new PrimaryCL());
     }
 
-    // private void status(){
-    //     System.out.println(RESOURCE_ID);
-    // }
-
     @Override
     public void addSecondaryCL(ChunkPos pos) {
-        System.out.println("add sec");
         scls.putIfAbsent(pos, new SecondaryCL());
         getCLsInRange(pcls, pos)
             .filter(primary -> primary.isActive())
@@ -111,14 +133,12 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
 
     @Override
     public void removePrimaryCL(ChunkPos pos) {
-        System.out.println("remove prim");
         setPrimaryActive(pos, false);
         pcls.remove(pos);
     }
 
     @Override
     public void removeSecondaryCL(ChunkPos pos) {
-        System.out.println("remove sec");
         getCLsInRange(pcls, pos)
             .filter(primary -> primary.isActive())
             .forEach(primary -> forceChunk(primary, pos, false));
@@ -136,6 +156,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
         } else if (primary.isActive() == active) { return; }
 
         primary.setActive(active);
+        forceChunk(primary, pos, active);
         getCLsInRange(scls, pos)
             .forEach(secondary -> forceChunk(primary, pos, active));
     }
@@ -161,14 +182,14 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
             pt.putInt("z", entry.getKey().z);
             pt.putUUID("id", entry.getValue().id);
             pt.putBoolean("active", entry.getValue().isActive());
-            pTags.add(pt);
+            pTags.add(pTags.size(), pt);
         }
-        var sTags = new ListTag();
+        var sTags = new ListTag();// step into this, see why it skips
         for (var entry : scls.entrySet()){
             var st = new CompoundTag();
             st.putInt("x", entry.getKey().x);
             st.putInt("z", entry.getKey().z);
-            sTags.add(st);
+            sTags.add(sTags.size(), st);
         }
         var nbt = new CompoundTag();
         nbt.put("primaries", pTags);

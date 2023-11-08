@@ -15,11 +15,13 @@ public class SecondaryCLBlockEnt extends AbstractCLBlockEnt {
 
     @Override
     protected void registerSelf() {
+        if(this.level.isClientSide) return;
         getManager().ifPresent(m -> m.addSecondaryCL(getChunkPos()));
     }
     
     @Override
     protected void deregisterSelf() {
+        if(level.isClientSide || !manager.isPresent()) return;
         getManager().ifPresent(m -> m.removeSecondaryCL(getChunkPos()));
     }
 
