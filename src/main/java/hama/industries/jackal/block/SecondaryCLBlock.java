@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SecondaryCLBlock extends AbstractCLBlock {
 
-    public static final String ID = "secondary_reality_spike";
+    public static final String ID = "secondary_cl";
 
     public SecondaryCLBlock(Properties props) {
         super(props);

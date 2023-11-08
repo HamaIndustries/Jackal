@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public final class PrimaryCLBlock extends AbstractCLBlock {
 
-    public static final String ID = "primary_reality_spike";
+    public static final String ID = "primary_cl";
 
     public PrimaryCLBlock(Properties props) {
         super(props);

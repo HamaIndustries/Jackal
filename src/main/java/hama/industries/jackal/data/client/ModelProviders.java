@@ -1,15 +1,11 @@
 package hama.industries.jackal.data.client;
 
 import hama.industries.jackal.JackalMod;
-import hama.industries.jackal.block.PrimaryCLBlock;
-import hama.industries.jackal.block.SecondaryCLBlock;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelFile.ExistingModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -48,6 +44,8 @@ public class ModelProviders {
                     .modelFile(getSimpleModel(modLoc("block/pcl_enabled_active")))
                     .addModel();
 
+            itemModels().basicItem(JackalMod.ITEMS.PRIMARY_CL);
+
             getVariantBuilder(JackalMod.BLOCKS.SECONDARY_CL)
                 .partialState().with(BlockStateProperties.ENABLED,false)
                     .modelForState()
@@ -57,6 +55,8 @@ public class ModelProviders {
                     .modelForState()
                     .modelFile(getSimpleModel(modLoc("block/scl_enabled_active")))
                     .addModel();
+            
+            itemModels().basicItem(JackalMod.ITEMS.SECONDARY_CL);
         }
 
         private ExistingModelFile getSimpleModel(ResourceLocation location) {
@@ -66,7 +66,6 @@ public class ModelProviders {
         private ModelFile registerBlockAndItem(String id, Block block){
             var baseModel = models().cubeAll(id, modLoc("block/" + id));
             var poweredModel = models().cubeAll(id + "_powered", modLoc("block/" + id + "_powered"));
-
             getVariantBuilder(block)
                 .partialState().with(BlockStateProperties.ENABLED, false)
                     .modelForState()

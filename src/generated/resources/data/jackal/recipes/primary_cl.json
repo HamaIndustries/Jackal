@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "sas",
+    "sds",
+    "sss"
+  ],
+  "key": {
+    "s": {
+      "tag": "minecraft:sand"
+    },
+    "a": {
+      "tag": "forge:gems/amethyst"
+    },
+    "d": {
+      "tag": "forge:gems/diamond"
+    }
+  },
+  "result": {
+    "item": "jackal:primary_cl"
+  }
+}

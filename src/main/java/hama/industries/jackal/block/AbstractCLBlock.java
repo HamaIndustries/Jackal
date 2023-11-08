@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -19,6 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -29,21 +33,26 @@ import hama.industries.jackal.RegistryManager;
 
 @Mod.EventBusSubscriber(modid=JackalMod.MODID, bus=Mod.EventBusSubscriber.Bus.MOD)
 public abstract class AbstractCLBlock extends Block implements EntityBlock {
+    protected static final VoxelShape SHAPE = Block.box(0.0D, 1.0D, 0.0D, 16.0D, 9.0D, 16.0D);
 
     public static <T extends AbstractCLBlock> Supplier<T> supplierOf(Function<Properties, T> rsb) {
-        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F).noOcclusion());            
+        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F).noOcclusion().dynamicShape());            
     }
 
     @SubscribeEvent
     public final static void clientSetup (final FMLClientSetupEvent event) {
         ItemBlockRenderTypes.setRenderLayer(JackalMod.BLOCKS.PRIMARY_CL, RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(JackalMod.BLOCKS.SECONDARY_CL, RenderType.cutout());
-    }
-	
+    }	
 
     public AbstractCLBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.stateDefinition.any().setValue(BlockStateProperties.ENABLED, false));
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState p_60555_, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_) {
+        return SHAPE;
     }
 
     @Override
