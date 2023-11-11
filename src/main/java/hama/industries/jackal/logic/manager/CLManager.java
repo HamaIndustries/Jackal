@@ -1,27 +1,23 @@
-package hama.industries.jackal.logic;
+package hama.industries.jackal.logic.manager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.mojang.datafixers.types.templates.Tag.TagType;
-
 import hama.industries.jackal.JackalMod;
+import hama.industries.jackal.capability.ICLManagerCapability;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StreamTagVisitor;
 import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagTypes;
-import net.minecraft.nbt.TagVisitor;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeConfig.Server;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -31,36 +27,35 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+
 
 @Mod.EventBusSubscriber(modid = JackalMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CLManager implements ICLManagerCapability, INBTSerializable<CompoundTag> {
     public static final String RESOURCE_ID = "chunk_loader_manager_impl";
     private static final int RANGE = 7;
+    private static Map<ResourceKey<Level>, ServerLevel> dimMap = new HashMap<>();
 
     private Map<ChunkPos, PrimaryCL> pcls = new HashMap<>();
     private Map<ChunkPos, SecondaryCL> scls = new HashMap<>();
 
-    // private final ForgeChunkManager.TicketTracker<PrimaryCL> tickets = new ForgeChunkManager.TicketTracker<>();
-
     private ServerLevel level;
     public CLManager (ServerLevel level){
         this.level = level;
+        dimMap.put(level.dimension(), level);
     }
 
     @SubscribeEvent
     public static void attachCapability(final AttachCapabilitiesEvent<Level> event){
-        if (! (event.getObject() instanceof ServerLevel) ) return;
+        var level = event.getObject();
+        if (! (level instanceof ServerLevel) ) return;
 
-        var manager = new CLManager((ServerLevel)event.getObject());
+        var manager = new CLManager((ServerLevel)level);
         LazyOptional<ICLManagerCapability> optional = LazyOptional.of(() -> manager);
 
-        var provider = new ICapabilitySerializable<CompoundTag>() { 
-            // https://forge.gemwire.uk/wiki/Capabilities/1.18#Attaching_a_Capability
-            
+        var provider = new ICapabilitySerializable<CompoundTag>() {             
             @Override
             public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction direction) {
-                if (cap == ICLManagerCapability.CL_MANAGER_CAPABILITY) {
+                if (cap == ICLManagerCapability.TOKEN) {
                     return optional.cast();
                 }
                 return LazyOptional.empty();
@@ -85,15 +80,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     }
 
     public static void validateTickets(ServerLevel level, TicketHelper ticketHelper) {
-        // var cap = level.getCapability(CL_MANAGER_CAPABILITY);
-        // if (!cap.isPresent()) throw new UnsupportedOperationException("chunkloading manager not gettable for world " + level);
-        // cap.ifPresent(manager ->
-        //     ticketHelper.getEntityTickets().entrySet().stream().forEach(entry -> {
-        //         if (!manager.hasPrimaryCL(entry.getKey())){
-        //             ticketHelper.removeAllTickets(entry.getKey());
-        //         }
-        //     }
-        // ));
+        // we manage our own reinstatement with serialization (callback is unreliable; not always called due to caching)
         ticketHelper.getEntityTickets().keySet().stream().forEach(id -> ticketHelper.removeAllTickets(id));
     }
 
@@ -101,19 +88,20 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     public static void onWorldUnload(WorldEvent.Unload event){
         var level = event.getWorld();
         if (level instanceof ServerLevel) {
-            var cap = ((ServerLevel)level).getCapability(CL_MANAGER_CAPABILITY);
+            var cap = ((ServerLevel)level).getCapability(ICLManagerCapability.TOKEN);
             cap.ifPresent(manager -> {
                 manager.removeAllCLs();
             });
+            dimMap.remove(((ServerLevel)level).dimension());
         }
     }
 
     @Override
     public void removeAllCLs(){
-        for (var pos : pcls.keySet()){
+        for (var pos : pcls.keySet().stream().collect(Collectors.toList())){
             removePrimaryCL(pos);
         }
-        for (var pos : scls.keySet()){
+        for (var pos : scls.keySet().stream().collect(Collectors.toList())){
             removeSecondaryCL(pos);
         }
     }

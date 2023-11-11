@@ -1,4 +1,4 @@
-package hama.industries.jackal.logic;
+package hama.industries.jackal.capability;
 
 import java.util.UUID;
 
@@ -12,8 +12,12 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = JackalMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public interface ICLManagerCapability {
-    public static final Capability<ICLManagerCapability> CL_MANAGER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final Capability<ICLManagerCapability> TOKEN = CapabilityManager.get(new CapabilityToken<>(){});
 
+    public static void registerCaps(RegisterCapabilitiesEvent event) {
+        event.register(ICLManagerCapability.class);
+    }
+    
     public void addPrimaryCL(ChunkPos pos);
     public void addSecondaryCL(ChunkPos pos);
     public void removePrimaryCL(ChunkPos pos);
@@ -21,10 +25,5 @@ public interface ICLManagerCapability {
     public void removeAllCLs();
 
     public boolean hasPrimaryCL(UUID id);
-
     public void setPrimaryActive(ChunkPos pos, boolean active);
-
-    public static void registerCaps(RegisterCapabilitiesEvent event) {
-        event.register(ICLManagerCapability.class);
-    }
 }

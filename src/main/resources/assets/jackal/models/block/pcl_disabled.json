@@ -3,35 +3,23 @@
 	"texture_size": [32, 32],
 	"textures": {
 		"0": "jackal:block/chunk_loader_disabled",
-		"particle": "jackal:block/chunk_loader"
+		"particle": "jackal:block/chunk_loader_disabled"
 	},
 	"elements": [
 		{
 			"from": [0, 1, 0],
 			"to": [16, 9, 16],
 			"faces": {
-				"north": {"uv": [0, 12, 8, 16], "texture": "#0"},
-				"east": {"uv": [0, 12, 8, 16], "texture": "#0"},
+				"north": {"uv": [8, 12, 0, 16], "texture": "#0"},
+				"east": {"uv": [8, 12, 0, 16], "texture": "#0"},
 				"south": {"uv": [0, 12, 8, 16], "texture": "#0"},
 				"west": {"uv": [0, 12, 8, 16], "texture": "#0"},
-				"up": {"uv": [8, 0, 16, 8], "texture": "#0"},
-				"down": {"uv": [0, 0, 8, 8], "texture": "#0"}
-			}
-		},
-		{
-			"from": [0, 9, 0],
-			"to": [16, 8, 16],
-			"faces": {
-				"north": {"uv": [0, 0, 16, 0], "texture": "#0"},
-				"east": {"uv": [0, 0, 16, 0], "texture": "#0"},
-				"south": {"uv": [0, 0, 16, 0], "texture": "#0"},
-				"west": {"uv": [0, 0, 16, 0], "texture": "#0"},
 				"up": {"uv": [8, 8, 16, 16], "texture": "#0"},
 				"down": {"uv": [0, 0, 8, 8], "texture": "#0"}
 			}
 		}
 	],
-	"display": {},
 	"groups": [
+		
 	]
 }

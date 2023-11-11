@@ -1,9 +1,12 @@
 package hama.industries.jackal.block.entity;
 
 import java.util.HashSet;
+import java.util.Set;
+
+// import com.simibubi.create.content.trains.station.StationBlockEntity;
 
 import hama.industries.jackal.block.AbstractCLBlock;
-import hama.industries.jackal.logic.ICLManagerCapability;
+import hama.industries.jackal.capability.ICLManagerCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -99,13 +102,13 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
         return getBlockState().getValue(BlockStateProperties.ENABLED);
     }
 
-    public abstract boolean isActive(); // active = allowed to force load if prompted
+    public abstract boolean isActive(); // active = should force load if possible
 
     LazyOptional<ICLManagerCapability> manager = LazyOptional.empty();
     public LazyOptional<ICLManagerCapability> getManager() {
         if (level.isClientSide) throw new UnsupportedOperationException("Client side tried to access chunkloading manager capability");
         if (!manager.isPresent()){
-            manager = getLevel().getCapability(ICLManagerCapability.CL_MANAGER_CAPABILITY);
+            manager = getLevel().getCapability(ICLManagerCapability.TOKEN);
             manager.addListener(m -> {manager = LazyOptional.empty();});
         }
         return manager;
