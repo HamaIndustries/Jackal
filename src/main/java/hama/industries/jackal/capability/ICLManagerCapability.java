@@ -3,6 +3,7 @@ package hama.industries.jackal.capability;
 import java.util.UUID;
 
 import hama.industries.jackal.JackalMod;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -24,6 +25,9 @@ public interface ICLManagerCapability {
     public void removeSecondaryCL(ChunkPos pos);
     public void removeAllCLs();
 
-    public boolean hasPrimaryCL(UUID id);
-    public void setPrimaryActive(ChunkPos pos, boolean active);
+    public void addTrigger(UUID id, ChunkPos pos);
+    public void removeTrigger(UUID id, ChunkPos pos);
+    public void setSelfTrigger(ChunkPos pos, boolean value);
+
+    public ServerLevel getLevel();
 }

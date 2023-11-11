@@ -59,9 +59,15 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
         }
     }
 
+    protected boolean unloading = false;
     @Override
-    public void setRemoved(){
-        if (!level.isClientSide) {
+    public void onChunkUnloaded() {
+        unloading = true;
+    }
+
+    @Override
+    public void setRemoved() {
+        if (!level.isClientSide && !unloading) {
             if (cache != null){
                 cache.remove(this);
                 for (var other : cache){
@@ -69,7 +75,8 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
                     return;
                 }
             }
-            // if no others, this is the main CL, so we want to deregister
+            
+            // if no others, this is the main CL, so we want to deregister IF break (world not unloading)
             deregisterSelf();
         }
         super.setRemoved();
@@ -115,6 +122,6 @@ public abstract class AbstractCLBlockEnt extends BlockEntity {
     }
 
     protected ChunkPos getChunkPos(){
-        return getLevel().getChunkAt(worldPosition).getPos();
+        return new ChunkPos(worldPosition);
     }
 }

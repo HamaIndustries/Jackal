@@ -31,7 +31,7 @@ public final class PrimaryCLBlockEnt extends AbstractCLBlockEnt {
     }
 
     public void updateActiveState(){
-        getManager().ifPresent(m -> m.setPrimaryActive(getChunkPos(), isActive()));
+        getManager().ifPresent(m -> m.setSelfTrigger(getChunkPos(), isActive()));
     }
 
     @Override

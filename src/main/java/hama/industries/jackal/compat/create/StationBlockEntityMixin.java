@@ -18,8 +18,11 @@
 
 // import com.simibubi.create.content.trains.station.GlobalStation;
 
+// //remmove
+// import com.simibubi.create.content.trains.station.StationBlockEntity;
+
 // @Mixin(com.simibubi.create.content.trains.station.StationBlockEntity.class)
-// public abstract class StationBlockEntityMixin extends BlockEntity {
+// public abstract class StationBlockEntityMixin extends StationBlockEntity {
 //     public StationBlockEntityMixin(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {super(p_155228_, p_155229_, p_155230_);}
 
 //     @Shadow @Nullable
@@ -27,6 +30,7 @@
 
 //     @Nullable
 //     private PrimaryCLBlockEnt findNeighborCL(){
+        
 //         var world = (ServerLevel)level;
 //         for(Direction direction : Direction.values()) {
 //             var neighbor = level.getBlockEntity(worldPosition.relative(direction));
