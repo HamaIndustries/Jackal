@@ -1,0 +1,9 @@
+{
+    "required": true,
+	"package": "hama.industries.jackal.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+        "compat.create.TrainMixin",
+        "compat.create.GlobalStationMixin"
+    ]
+}

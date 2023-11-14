@@ -124,6 +124,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     public void removePrimaryCL(ChunkPos pos) {
         setPrimaryActive(pos, false);
         pcls.remove(pos);
+        System.out.println("wow");
     }
 
     @Override
