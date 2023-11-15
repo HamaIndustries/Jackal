@@ -18,10 +18,15 @@ import hama.industries.jackal.logic.manager.ICLTrigger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.jfr.event.WorldLoadFinishedEvent;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.client.server.IntegratedServer;
 
 @Mixin(com.simibubi.create.content.trains.station.GlobalStation.class)
 public abstract class GlobalStationMixin extends SingleBlockEntityEdgePoint implements ICLTrigger {
@@ -38,7 +43,7 @@ public abstract class GlobalStationMixin extends SingleBlockEntityEdgePoint impl
 	public abstract Train getPresentTrain();
 
     public void registerCLTrigger(){// should be called when a train appears
-        JackalMod.logger().debug("registering station with id " + this.id);
+        JackalMod.logger().debug("registering station with id " + this.id + ", pos " + getBlockEntityPos() + ", dim " + getBlockEntityDimension());
         if (getBlockEntityPos() != null){
             clManager.ifPresent(manager -> manager.addTrigger(id, new ChunkPos(getBlockEntityPos())));
         } 
@@ -51,10 +56,12 @@ public abstract class GlobalStationMixin extends SingleBlockEntityEdgePoint impl
         }
     }
 
-    @Inject(method = "read", at = @At("HEAD"), remap = false)
+    @Inject(method = "read", at = @At("TAIL"), remap = false)
     public void onRead(CompoundTag nbt, boolean migration, DimensionPalette dimensions, CallbackInfo ci) {
-        setManager(ServerLifecycleHooks.getCurrentServer().getLevel(blockEntityDimension));
+        var level = ServerLifecycleHooks.getCurrentServer().getLevel(blockEntityDimension);
+        setManager(level);
     }
+
 
     @Inject(method = "blockEntityAdded", at = @At("RETURN"), remap = false)
 	public void onBlockEntityAdded(BlockEntity blockEntity, boolean front, CallbackInfo ci) {

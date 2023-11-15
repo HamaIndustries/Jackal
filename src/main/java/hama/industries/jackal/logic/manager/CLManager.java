@@ -89,21 +89,15 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     public static void validateTickets(ServerLevel level, TicketHelper ticketHelper) {
         // we manage our own reinstatement with serialization (callback is unreliable; not always called due to caching)
         ticketHelper.getEntityTickets().keySet().stream().forEach(id ->{
-            System.out.println("removing tickets for " + id);
+            JackalMod.logger().debug("removing chunk tickets for " + id);
             ticketHelper.removeAllTickets(id);
         });
     }
 
-    @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload event){
-        //     var cap = ((ServerLevel)level).getCapability(ICLManagerCapability.TOKEN);
-        //     cap.ifPresent(manager -> {
-        //         manager.removeAllCLs();
-        //     });
-    }
-
     @Override
     public void removeAllCLs(){
+        // removing all then adding a redstone trigger to a primary can cause a null entry
+        // into triggers. should be avoided.
         for (var pos : pcls.keySet().stream().collect(Collectors.toList())){
             removePrimaryCL(pos);
         }
@@ -124,7 +118,6 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     public void removePrimaryCL(ChunkPos pos) {
         setPrimaryActive(pos, false);
         pcls.remove(pos);
-        System.out.println("wow");
     }
 
     @Override
@@ -167,6 +160,9 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
         }
         var TrigTags = new ListTag();
         for (var entry : triggers.entries()){
+            if (entry.getValue() == null){
+                JackalMod.logger().debug("null entry found for");
+            }
             var t = new CompoundTag();
             t.putInt("x", entry.getKey().x);
             t.putInt("z", entry.getKey().z);
@@ -193,6 +189,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
         });
         nbt.getList("triggers", Tag.TAG_COMPOUND).forEach(tr -> {
             var ttag = (CompoundTag)tr;
+            var c = ttag.getUUID("id");
             var pos = new ChunkPos(ttag.getInt("x"), ttag.getInt("z"));
             addTrigger(ttag.getUUID("id"), pos);
         });
@@ -225,7 +222,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     }
 
     private boolean isPrimaryActiveAt(ChunkPos pos) {
-        // doesn't say if it is actually forcing a given chunk, just whether it should force
+        // doesn't say if it is actually forcing a given chunk, just whether it should/is possible to force
         return triggers.containsKey(pos) && pcls.containsKey(pos);
     }
 
@@ -242,15 +239,20 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     }
 
     private void forceChunk(UUID primary, ChunkPos pos, boolean forced){
-        System.out.println(pos);
         ForgeChunkManager.forceChunk(level, JackalMod.MODID, primary, pos.x, pos.z, forced, true);
     }
 
-    // for now, throw if no existing primary at position
     @Override
     public void setSelfTrigger(ChunkPos pos, boolean value) {
-        if (value) addTrigger(pcls.get(pos), pos);
-        else removeTrigger(pcls.get(pos), pos);
+        var self = pcls.get(pos);
+        if (self == null){
+            // may have been cleared such as by command, but we assume self-triggering
+            // is called only by valid primaries and so create a new one at this chunk.
+            addPrimaryCL(pos);
+            self = pcls.get(pos);
+        }
+        if (value) addTrigger(self, pos);
+        else removeTrigger(self, pos);
     }
 
     private void report(){
