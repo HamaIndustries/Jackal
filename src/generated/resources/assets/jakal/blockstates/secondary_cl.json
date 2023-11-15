@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "enabled=false": {
+      "model": "jakal:block/scl_disabled"
+    },
+    "enabled=true": {
+      "model": "jakal:block/scl_enabled_active"
+    }
+  }
+}

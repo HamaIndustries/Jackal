@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "enabled=false": {
+      "model": "jakal:block/pcl_disabled"
+    },
+    "enabled=true,powered=false": {
+      "model": "jakal:block/pcl_enabled"
+    },
+    "enabled=true,powered=true": {
+      "model": "jakal:block/pcl_enabled_active"
+    }
+  }
+}

@@ -24,9 +24,9 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
-def modid = 'jackal'
+def modid = 'jakal'
 def groupid = 'hama.industries'
-version = '1.0'
+version = '2.4.0'
 group = groupid + '.' + modid
 archivesBaseName = modid
 
@@ -77,7 +77,7 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
-                jackal {
+                jakal {
                     source sourceSets.main
                 }
             }
@@ -97,7 +97,7 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
-                jackal {
+                jakal {
                     source sourceSets.main
                 }
             }
@@ -128,7 +128,7 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
-                jackal {
+                jakal {
                     source sourceSets.main
                 }
             }
@@ -148,7 +148,7 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
-                jackal {
+                jakal {
                     source sourceSets.main
                 }
             }
@@ -204,8 +204,8 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, 'mixins.jackal.refmap.json'
-    config 'mixins.jackal.json'
+    add sourceSets.main, 'mixins.jakal.refmap.json'
+    config 'mixins.jakal.json'
     // debug.verbose = true
     // debug.export = true
 }

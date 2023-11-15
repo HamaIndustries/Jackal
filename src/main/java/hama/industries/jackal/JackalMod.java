@@ -16,7 +16,7 @@ public class JackalMod
 {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final String MODID = "jackal";
+    public static final String MODID = "jakal";
 
     public static RegistryManager REGISTRY = new RegistryManager();
 

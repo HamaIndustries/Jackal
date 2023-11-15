@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "jakal:secondary_cl"
+    ]
+  },
+  "criteria": {
+    "has_cl": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "jakal:primary_cl"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "jakal:secondary_cl"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_cl",
+      "has_the_recipe"
+    ]
+  ]
+}
