@@ -1,4 +1,4 @@
-![Jackal Logo](JackalLogo_hd.png)
+![Jakal Logo](JakalLogo_hd.png)
 
 https://www.curseforge.com/minecraft/mc-mods/jakal
 
