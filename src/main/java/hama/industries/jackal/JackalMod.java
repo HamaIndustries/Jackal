@@ -1,10 +1,14 @@
 package hama.industries.jackal;
 
 import com.mojang.logging.LogUtils;
+import com.simibubi.create.infrastructure.config.AllConfigs;
 
+import hama.industries.jackal.config.JakalConfig;
 import hama.industries.jackal.logic.manager.CLManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.common.world.ForgeChunkManager;
@@ -31,13 +35,14 @@ public class JackalMod
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         REGISTRY.registerAllModBus(FMLJavaModLoadingContext.get().getModEventBus());
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, JakalConfig.GENERAL_SPEC, "jakal.toml");
     }
 
     private void setup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> ForgeChunkManager.setForcedChunkLoadingCallback(JackalMod.MODID, CLManager::validateTickets));
     }
-
     public static Logger logger(){ return LOGGER; }
 
 }

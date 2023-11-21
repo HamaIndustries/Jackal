@@ -16,6 +16,7 @@ import com.google.common.collect.HashMultimap;
 
 import hama.industries.jackal.JackalMod;
 import hama.industries.jackal.capability.ICLManagerCapability;
+import hama.industries.jackal.config.JakalConfig;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Direction;
@@ -42,7 +43,6 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = JackalMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CLManager implements ICLManagerCapability, INBTSerializable<CompoundTag> {
     public static final String RESOURCE_ID = "chunk_loader_manager_impl";
-    private static final int RANGE = 7;
 
     private Map<ChunkPos, UUID> pcls = new HashMap<>();
     private Set<ChunkPos> scls = new HashSet<>();
@@ -136,7 +136,7 @@ public final class CLManager implements ICLManagerCapability, INBTSerializable<C
     }
 
     private Stream<ChunkPos> getChunksInRange(Stream<ChunkPos> cls, ChunkPos pos){
-        return cls.filter(p -> (p.getChessboardDistance(pos) <= RANGE));
+        return cls.filter(p -> (p.getChessboardDistance(pos) < JakalConfig.PRIMARY_CL_CONTROL_RADIUS.get()));
     }
 
     @Override
