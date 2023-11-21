@@ -18,15 +18,10 @@ import hama.industries.jackal.logic.manager.ICLTrigger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.profiling.jfr.event.WorldLoadFinishedEvent;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.minecraft.client.server.IntegratedServer;
 
 @Mixin(com.simibubi.create.content.trains.station.GlobalStation.class)
 public abstract class GlobalStationMixin extends SingleBlockEntityEdgePoint implements ICLTrigger {

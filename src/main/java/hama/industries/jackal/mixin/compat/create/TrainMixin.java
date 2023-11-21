@@ -15,7 +15,6 @@ public abstract class TrainMixin {
 
     @Inject(method = "arriveAt", at = @At("RETURN"), remap = false)
     public void arriveAt(GlobalStation station, CallbackInfo ci) {
-        System.out.println("train arrived");
         ((ICLTrigger) (Object) station).registerCLTrigger();
     }
 
