@@ -34,7 +34,7 @@ public abstract class AbstractCLBlock extends Block implements EntityBlock {
     protected static final VoxelShape SHAPE = Block.box(0.0D, 1.0D, 0.0D, 16.0D, 9.0D, 16.0D);
 
     public static <T extends AbstractCLBlock> Supplier<T> supplierOf(Function<Properties, T> rsb) {
-        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).strength(1.0F).noOcclusion().dynamicShape());            
+        return () -> rsb.apply(BlockBehaviour.Properties.of(Material.STONE).noOcclusion().dynamicShape().strength(1.0F)); 
     }
 
     @SubscribeEvent

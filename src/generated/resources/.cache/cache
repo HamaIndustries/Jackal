@@ -4,7 +4,10 @@
 f5845998ba94522bce966a6fba3cdf7540991f03 assets/jakal/models/item/secondary_cl.json
 75037ac34cec8be1fb118aed201915612f4922fe data/jakal/advancements/recipes/redstone/primary_cl.json
 7ec3f3488ecf796580e6466ea3b6ca9420ebdd5f data/jakal/advancements/recipes/redstone/secondary_cl.json
+7d866a268358ce1fe4add65bca78f46f1a3704c8 data/jakal/loot_tables/blocks/primary_cl.json
+b8bfa9c06808dd6f405f02814cf059ca7e08964f data/jakal/loot_tables/blocks/secondary_cl.json
 db67372838aa90a3bcbf25a51902654e025e5d76 data/jakal/recipes/primary_cl.json
 6ef8ba912a394065a9b8054913c1ca0b40562449 data/jakal/recipes/secondary_cl.json
 3af8d9c3ead4e06a935f1ce67760672afe88f225 data/jakal/tags/blocks/reality_spikes.json
 621e874825ee451df5b60b98add0b4c7071044a1 data/jakal/tags/items/reality_spikes.json
+3af8d9c3ead4e06a935f1ce67760672afe88f225 data/minecraft/tags/blocks/mineable/pickaxe.json

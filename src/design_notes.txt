@@ -1,4 +1,14 @@
-design ideas to keep things straight
+design idea dump, may be insanely outdated without notice.
+
+----
+
+Versioning: major.minor.fix
+
+major: NOT forward compatible, will break existing installs.
+minor: forward compatible content update (new blocks, items etc)
+fix: forward compatible non-content update (features, fixes etc)
+
+----
 
 JACKAL's Anotha ChunkA Loada seeks to right the wrongs of the past and bring glory to this time.
 

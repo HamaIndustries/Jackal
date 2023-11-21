@@ -7,6 +7,7 @@ import hama.industries.jackal.lib.JackalTags;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class TagProviders {
@@ -28,9 +29,8 @@ public class TagProviders {
 
         @Override
         protected void addTags() {
-            tag(JackalTags.BLOCK.CHUNK_LOADERS).add(
-                JackalMod.BLOCKS.PRIMARY_CL, JackalMod.BLOCKS.SECONDARY_CL
-            );
+            tag(JackalTags.BLOCK.CHUNK_LOADERS).add(JackalMod.BLOCKS.PRIMARY_CL, JackalMod.BLOCKS.SECONDARY_CL);
+            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(JackalMod.BLOCKS.PRIMARY_CL, JackalMod.BLOCKS.SECONDARY_CL);
         }
 
     }

@@ -26,7 +26,7 @@ apply plugin: 'org.spongepowered.mixin'
 
 def modid = 'jakal'
 def groupid = 'hama.industries'
-version = '2.4.2'
+version = '2.4.3'
 group = groupid + '.' + modid
 archivesBaseName = modid
 
@@ -172,6 +172,13 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -204,7 +211,12 @@ dependencies {
     // compileOnly fg.deobf("com.simibubi.create:create-${create_minecraft_version}:${create_version}:slim") { transitive = false }
     // compileOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
     // compileOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}")
-
+    
+    // testing helpers
+    // implementation fg.deobf("curse.maven:jade-324717:4575623")
+    // implementation fg.deobf("curse.maven:mouse-tweaks-60089:3578801")
+    // implementation fg.deobf("curse.maven:jei-238222:4593548")
+    // implementation fg.deobf("curse.maven:cofh-core-69162:4801048")// show tags
 }
 
 mixin {

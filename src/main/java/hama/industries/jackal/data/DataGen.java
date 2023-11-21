@@ -19,6 +19,7 @@ public class DataGen {
         if (event.includeServer()) {
             TagProviders.provideAll(generator, fileHelper);
             generator.addProvider(new RecipeProviders(generator));
+            generator.addProvider(new LootProviders(generator));
         }
     }
 }
